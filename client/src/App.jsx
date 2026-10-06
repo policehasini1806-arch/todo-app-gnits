@@ -10,6 +10,8 @@ function App() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const TASKS_PER_PAGE = 10;
 
   // Shows an error in the banner (and logs it in the console)
   function showError(err) {
@@ -88,7 +90,13 @@ function App() {
 
   // Only the todos that match the selected filter
   const filteredTodos = todos.filter(FILTERS[filter].test);
+  const totalPages = Math.ceil(filteredTodos.length / TASKS_PER_PAGE);
 
+  const startIndex = (currentPage - 1) * TASKS_PER_PAGE;
+  const currentTodos = filteredTodos.slice(
+    startIndex,
+    startIndex + TASKS_PER_PAGE
+  );
   // "1 task" or "3 tasks"
   const taskWord = filteredTodos.length === 1 ? "task" : "tasks";
 
@@ -113,8 +121,9 @@ function App() {
     }
 
     return (
+      <>
       <ul className="todo-list">
-        {filteredTodos.map((todo) => (
+        {currentTodos.map((todo) => (
           <TodoItem
             key={todo._id}
             todo={todo}
@@ -123,15 +132,46 @@ function App() {
           />
         ))}
       </ul>
+      {totalPages > 1 && (
+  <div className="pagination">
+    <button
+      onClick={() => setCurrentPage((prev) => prev - 1)}
+      disabled={currentPage === 1}
+    >
+      ←
+    </button>
+
+    {Array.from({ length: totalPages }, (_, index) => (
+      <button
+        key={index + 1}
+        className={currentPage === index + 1 ? "active" : ""}
+        onClick={() => setCurrentPage(index + 1)}
+      >
+        {index + 1}
+      </button>
+    ))}
+
+    <button
+      onClick={() => setCurrentPage((prev) => prev + 1)}
+      disabled={currentPage === totalPages}
+    >
+      →
+    </button>
+  </div>
+)}
+</>
     );
   }
-
+  function handleFilterChange(newFilter) {
+  setFilter(newFilter);
+  setCurrentPage(1);
+}
   return (
     <div className="layout">
       <Sidebar
         todos={todos}
         filter={filter}
-        onFilter={setFilter}
+        onFilter={handleFilterChange}
         onClearDone={handleClearDone}
       />
 
