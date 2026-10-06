@@ -11,7 +11,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const TASKS_PER_PAGE = 10;
+  const TASKS_PER_PAGE = 5;
 
   // Shows an error in the banner (and logs it in the console)
   function showError(err) {
